@@ -133,5 +133,5 @@ class OpenWeatherClient {
 //  ["sunrise"]=> int(1526871731) 
 //# ["sunset"]=> int(1526925626) } 
 //  ["id"]=> int(787215)
-//  ["name"]=> string(7) "Paracin" 
+//  ["name"]=> string(7) "Beograd" 
 //  ["cod"]=> int(200) } 
