@@ -22,7 +22,7 @@ and open the template in the editor.
     </head>
     <body>
         <form method="GET">
-            <input name="cityInput" type="text" value="<?php echo $city; ?>">
+            Enter City:<input name="cityInput" type="text" value="<?php echo $city; ?>">
         </form>
         <?php
         if ($city != "") {
