@@ -1,4 +1,5 @@
 <?php
+
 class OpenWeatherClient {
 
     private $ch;
@@ -6,49 +7,101 @@ class OpenWeatherClient {
     private $appID;
 
     function __construct(string $appID) {
-        $this->ch = curl_init();
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-        $this->baseUrl = "api.openweathermap.org/data/2.5/weather";
-        $this->appID = $appID;
+        $this->ch = curl_init(); // Does HTTP Requests.
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true); // Setting Option to return the request body. 
+        $this->baseUrl = "api.openweathermap.org/data/2.5/weather"; // Assigning URL(string) to the variable.
+        $this->appID = $appID; // Assgning value to appID var. 
     }
 
     public function getWeatherByCity(string $city): Weather {
-        curl_setopt($this->ch, CURLOPT_URL, $this->baseUrl . "?q=$city&appid=" . $this->appID);
-        curl_setopt($this->ch, CURLOPT_HTTPHEADER, ["Accept: application-json", "Content-Type: application-json"]);
+        curl_setopt($this->ch, CURLOPT_URL, $this->baseUrl . "?q=$city&units=metric&appid=" . $this->appID); // Tell CURL what url to call.
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, ["Accept: application/json", "Content-Type: application/json"]); // Tells CURL the expcted headers. 
 
-        $response = curl_exec($this->ch);
-        $httpcode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        $response = curl_exec($this->ch); // Executing the HTTP request and returns (in this case) JSON String.
+        $httpcode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE); // Gets the HTTP Status code ( Error codes etc... ).
 
         switch ($httpcode) {
-            case 404: throw new Exception("No such city in database");
-            case 400: throw new Exception("No city entered in search field");
-            case 401: throw new Exception("API Error, please try again later");
+            case 404: throw new Exception("No such city in database"); // Handling 404 error code.
+            case 400: throw new Exception("No city entered in search field"); // Handling 400 error code.
+            case 401: throw new Exception("API Error, please try again later"); // Handling 401 error code.
         }
-        return $this->parseResponse($response);
-    }
-
-    public function getWeatherDescription() {
-        
+        return $this->parseResponse($response); // Returns a Weather object.
     }
 
     private function parseResponse(string $response): Weather {
-        $this->response = json_decode($response);
-        var_dump($this->response);
-        $weather = array_shift($this->response->weather);
+        $response_obj = json_decode($response); // Creates an object from JSON data.
+        //var_dump($response_obj);
+       // $weather = array_shift($response_obj->weather); // Gets the first index of the weather array.
         $weather1 = (new Weather())
-                ->setName($this->response->name)
-                ->setDescription($weather->main)
-                ->setLat($this->response->coord->lat)
-                ->setLon($this->response->coord->lon)
-                ->setPressure($this->response->main->pressure);
-
+                ->setName($response_obj->name)
+                ->setDescription($response_obj->weather[0]->description) // $weather->description
+                ->setLat($response_obj->coord->lat)
+                ->setLon($response_obj->coord->lon)
+                ->setPressure($response_obj->main->pressure)
+                ->setTemp($response_obj->main->temp)
+                ->setHumidity($response_obj->main->humidity)
+                ->setWind($response_obj->wind->speed)
+                ->setIcon($response_obj->weather[0]->icon); // $weather->icon // Initializes a new Weather object.
         // print_r($response);
-        return $weather1;
+        return $weather1; // Returns initialized weather object. 
+    }
+
+    public function printData(Weather $weather) {
+        echo "<table border='1'>
+            <tr>
+                <td>
+                    City
+                </td>
+                <td>
+                   Description
+                </td>
+                <td>
+                    Location
+                </td>
+                <td>
+                    Temperature
+                </td>
+                <td>
+                    Pressure
+                </td>
+                <td>
+                    Humidity
+                </td>
+                <td>
+                    Wind
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    ".$weather->getName()."
+                </td>
+                <td>
+                    ".$weather->getDescription()."
+                    <img src='http://openweathermap.org/img/w/".$weather->getIcon().".png' align='middle'>
+                </td>
+                <td>
+                     Latitude:  ". $weather->getLat()."
+                     <br>
+                     Longitude:  ". $weather->getLon()."
+                </td>
+                <td>
+                  ".$weather->getTemp() ."  Celsius
+                </td>
+                <td>
+                    ".$weather->getPressure() ."  Psa
+                </td>
+                <td>
+                   ".$weather->getHumidity() ."  Percent
+                </td>
+                <td>
+                    ".$weather->getWind() ."  Km/h
+                </td>
+
+            </tr>
+        </table>";
     }
 
 }
-
-
 
 //  { ["coord"]=> object(stdClass)#2 (2) 
 //  { ["lon"]=> float(21.41) 

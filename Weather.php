@@ -9,6 +9,8 @@ class Weather {
     private $temp;
     private $pressure;
     private $humidity;
+    private $wind;
+    private $icon;
 
     function getName(): string {
         return $this->name;
@@ -61,6 +63,33 @@ class Weather {
 
     function setPressure($pressure): Weather {
         $this->pressure = $pressure;
+        return $this;
+    }
+
+    function getHumidity() {
+        return $this->humidity;
+    }
+
+    function setHumidity($humidity) {
+        $this->humidity = $humidity;
+        return $this;
+    }
+
+    function getWind() {
+        return $this->wind;
+    }
+
+    function setWind($wind) {
+        $this->wind = $wind;
+        return $this;
+    }
+
+    function getIcon() {
+        return $this->icon;
+    }
+
+    function setIcon($icon) {
+        $this->icon = $icon;
         return $this;
     }
 

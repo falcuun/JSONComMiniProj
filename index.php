@@ -1,12 +1,11 @@
 <?php
-include "Weather.php";
-include "Client.php";
+include "Weather.php"; // Including external class.
+include "Client.php"; // Including external class.
 
-$client = new OpenWeatherClient("63517466dcd2284276d4da5d4e897dd5");
-try {
-    $weather = $client->getWeatherByCity("Paracin");
-} catch (Exception $e) {
-    echo $e->getMessage();
+$city = "";
+if (isset($_GET["cityInput"])) {
+    $city = $_GET["cityInput"];
+    $client = new OpenWeatherClient("63517466dcd2284276d4da5d4e897dd5"); // Creating a new Client object giving it a unique appID.
 }
 ?>
 <!DOCTYPE html>
@@ -22,54 +21,23 @@ and open the template in the editor.
         <title></title>
     </head>
     <body>
-        <table border="1">
-            <tr>
-                <td>
-                    <?php
-                    echo "City";
-                    ?>
-                </td>
-                <td>
-                    <?php
-                    echo "Description";
-                    ?>
-                </td>
-                <td>
-                    <?php
-                    print_r("Location");
-                    ?>
-                </td>
-                <td>
-                    <?php
-                    print_r("Pressure");
-                    ?>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <?php
-                    echo $weather->getName();
-                    ?>
-                </td>
-                <td>
-                    <?php
-                    echo $weather->getDescription();
-                    ?>
-                </td>
-                <td>
-                    <?php
-                    print_r("Latitude: " . $weather->getLat());
-                    echo "<br>";
-                    print_r("Longitude: " . $weather->getLon());
-                    ?>
-                </td>
-                <td>
-                    <?php
-                    print_r($weather->getPressure());
-                    ?>
-                </td>
+        <form method="GET">
+            <input name="cityInput" type="text" value="<?php echo $city; ?>">
+        </form>
+        <?php
+        if ($city != "") {
+            try {
+                $weather = $client->getWeatherByCity($city); // Creats a Weather object and passing it a name of the city as a parameter;
+            } catch (Exception $e) {
+                echo $e->getMessage();
+            }
+        }
+        if (isset($weather)) {
 
-            </tr>
-        </table>
+            $client->printData($weather);
+        }
+        ?>
+
+
     </body>
 </html>
